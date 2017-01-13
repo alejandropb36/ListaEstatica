@@ -1,41 +1,52 @@
+/** Autor: Alejandro Ponce.
+ *  Grado: Estudiante de ing. en Computacion
+ *  Archivo: "lista.h"
+ *  Descripcion: Lista estatica con template.
+ *               Esta es capaz de manejar cualquier dato modificando un poco el codigo
+ *               Prestar atencion a la funcion "repetido" y en "toString()" !
+ */
 #ifndef LISTA_H
 #define LISTA_H
 
-
 #include <iostream>
 
-#define MAX 100
 using namespace std;
-
 
 template <class T1>
 class Lista
 {
 public:
-	Lista();//inicializa
-	bool vacia();//Imprime si la lista esta vacia
-	bool llena();//Si esta llena
-	void insertar(T1);//Agrega elemento
-	void eliminar(int);//Elimina necesitamos nota:posicion (o isbn)
-	int primero();//Imprime el primer titulo (pienso en to strign)
-	int ultimo();//ultimo (buscar estos metodos^ )
+	Lista();
+	bool vacia(); // importante
+	bool llena();
+	void insertar(T1); // importante
+	void eliminar(int); //importante
+	int primero();
+	int ultimo();
 	int anterior(int);
 	int siguiente(int);
-	int localiza(T1);//retorna posicion
-	T1 recupera(int);//Recupera el contenido del nodo Uso quizas de un tostring
-	void imprimirlista();
-	void anula();//esto podria ser con el destructor (investigar)
-	bool repetido(T1);//devuelve V o F si esta repetido
+	int localiza(T1); // importante
+	T1& recupera(int); // importante
+	void imprimirlista(); //importante
+	void anula();
+	bool repetido(T1); // importante
+	void insertion_sort(); // Metodos de orenamiento
+	void selection_sort(); // """"
+	void bubble_sort(); // """"
+	void my_swap(int,int); /// """
+	const static int MAX = 100;
+
 private:
 	T1 lista[MAX];
 	int ult;
 };
 
+
+
 template <class T1>
 Lista<T1>::Lista()
 {
 	ult = -1;
-
 }
 
 template <class T1>
@@ -57,9 +68,16 @@ bool Lista<T1>::llena() {
 template <class T1>
 void Lista<T1>::insertar(T1 elemento) {
 	if (!llena())
-		lista[++ult] = elemento;
+    {
+        if (!repetido(elemento))
+        {
+            lista[++ult] = elemento;
+        }
+        else
+            cout << "elemento repetido" << endl;
+    }
 	else
-		cout << "Error..." << endl;
+		cout << "lista llena!" << endl;
 }
 
 template <class T1>
@@ -72,8 +90,6 @@ void Lista<T1>::eliminar(int ind) {
 			ult--;
 		}
 	}
-	else
-		cout << "Error..." << endl;
 }
 
 template <class T1>
@@ -111,36 +127,46 @@ int Lista<T1>::localiza(T1 elemento) {
 	bool encontrado=false;
 	if(!vacia()){
         for (int i = 0; i <= ult; i++){
-            if (lista[i].GetIsbn() == elemento.GetIsbn()) {
+            if (lista[i] == elemento) {
                 return i;
                 encontrado = true;
+                break;
             }
         }
+        if (!encontrado)
+            return -1;
 	}
-	if (!encontrado)
-		cout << "Error..." << endl;
+	return-1;
+
 }
 
 template <class T1>
-T1 Lista<T1>::recupera(int ind) {
+T1& Lista<T1>::recupera(int ind) {
+	T1 nulo;
 	if (!vacia()) {
-		if (ind <= ult) {
+		if (ind <= ult && ind!= -1) {
 			return lista[ind];
 		}
+		else
+        {
+            cout<< "elemento no existente" << endl;
+            return nulo;
+        }
 	}
 	else
-		cout << "Error..." << endl;
+    {
+        cout << "lista vacia!" << endl;
+        return nulo;
+    }
 }
 
 template <class T1>
 void Lista<T1>::imprimirlista() {
 	if (!vacia()) {
 		for (int i = 0;i <= ult;i++) {
-            cout<< recupera(i).toString()<<" Ejemplere: "<<recupera(i).GetEjemplares()<<" Precio: $"<<recupera(i).GetPrecio()<<endl;
+            cout << recupera(i).toString() << endl;
 		}
 	}
-	else
-		cout << "Error..." << endl;
 }
 
 template <class T1>
@@ -151,23 +177,96 @@ void Lista<T1>::anula() {
 template <class T1>
 bool Lista<T1>::repetido(T1 elemento)
 {
-    bool repetido=false;
     if (!vacia())
     {
+        bool rep = false;
         for(int i=0; i<=ult; i++)
         {
-            if (lista[i].GetIsbn()==elemento.GetIsbn())
+            if (lista[i]==elemento)
             {
-                    repetido=true;
+                rep = true;
+                return true;
             }
         }
-        if (repetido)
-        {
-            return true;
-        }
-        else return false;
+        if(!rep)
+            return false;
     }
     else return false;
 }
 
+template <class T1>
+void Lista<T1>::my_swap(int i, int j)
+{
+    T1 temp = lista[i];
+    lista[i]=lista[j];
+    lista[j]=temp;
+}
+
+template <class T1>
+void Lista<T1>::bubble_sort()
+{
+    if(!vacia())
+    {
+        for (int j=0; j<ult; j++)
+        {
+            for (int i=ult; i>j; i--)
+            {
+                if( lista[i] > lista[i-1] )
+                    my_swap(i,i-1);
+            }
+        }
+
+    }
+    else
+        cout << "Lista vacia!" << endl;
+}
+
+template <class T1>
+void Lista<T1>::selection_sort()
+{
+    if( !vacia() )
+    {
+        T1 tmp;
+        int ind;
+        for (int j=0; j<=ult; j++)
+        {
+            tmp = lista[j];
+            ind = j;
+            for (int i = j+1; i<=ult; i++)
+            {
+                if (lista [i] > tmp )
+                {
+                    tmp = lista[i];
+                    ind = i;
+                }
+            }
+            my_swap(ind,j);
+        }
+    }
+    else
+        cout << "Lista vacia!" << endl;
+}
+
+template <class T1>
+void Lista<T1>::insertion_sort()
+{
+    if( !vacia() )
+    {
+        int j;
+        T1 tmp;
+        for(int i=1;i<=ult; i++)
+        {
+            tmp = lista[i];
+            j=i-1;
+            while( (lista[j]<tmp) && (j>=0) )
+            {
+                my_swap(j+1,j);
+                j--;
+            }
+            lista[j+1]=tmp;
+        }
+    }
+    else
+        cout << "Lista vacia!" << endl;
+}
 #endif // LISTA_H
